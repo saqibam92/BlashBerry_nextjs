@@ -1,0 +1,105 @@
+// File: apps/client/src/components/products/ProductDetailsClient.jsx
+
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Button from "@/components/ui/Button";
+import ProductCard from "../ui/ProductCard"; // Assuming you have this
+import { formatPrice } from "@/lib/utils";
+import { useCart } from "@/contexts/CartContext";
+import toast from "react-hot-toast";
+
+// This component handles all the client-side logic
+export default function ProductDetailsClient({ product, similarProducts }) {
+  const { addToCart } = useCart();
+  // Set the first size as the default selected size
+  const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      toast.error("Please select a size.");
+      return;
+    }
+    addToCart(product, 1, selectedSize);
+    toast.success(`${product.name} added to cart!`);
+  };
+
+  return (
+    <div className="bg-white">
+      <div className="pt-6">
+        <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
+          {/* Product Image */}
+          <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              width={800}
+              height={800}
+              className="h-full w-full object-cover object-center"
+              priority
+            />
+          </div>
+
+          {/* Product Info */}
+          <div className="lg:border-l lg:border-gray-200 lg:pl-8">
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+              {product.name}
+            </h1>
+            <p className="text-3xl tracking-tight text-gray-900 mt-4">
+              {formatPrice(product.price)}
+            </p>
+
+            <div className="mt-10">
+              <h3 className="text-sm font-medium text-gray-900">Description</h3>
+              <div className="space-y-6 mt-4">
+                <p className="text-base text-gray-900">{product.description}</p>
+              </div>
+            </div>
+
+            <div className="mt-10">
+              <h3 className="text-sm font-medium text-gray-900">Size</h3>
+              <div className="flex items-center space-x-3 mt-4">
+                {product.sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`border rounded-md py-2 px-4 text-sm font-medium transition-colors ${
+                      selectedSize === size
+                        ? "bg-indigo-600 text-white border-indigo-600"
+                        : "bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              onClick={handleAddToCart}
+              className="mt-10 text-dark w-full"
+              size="lg"
+            >
+              Add to Cart
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Similar Products Section */}
+      {similarProducts && similarProducts.length > 0 && (
+        <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+            You might also like
+          </h2>
+          <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+            {similarProducts.map((p) => (
+              <ProductCard key={p._id} product={p} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
