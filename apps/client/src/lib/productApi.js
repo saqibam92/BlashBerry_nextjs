@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 // File: apps/client/src/lib/productApi.js
 
+=======
+>>>>>>> efe85d4b10dbb84309514e8dd369525e1ee8b165
 import api from "./api";
 
 /**
