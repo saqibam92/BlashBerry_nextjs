@@ -1,3 +1,5 @@
+// File: apps/client/src/app/(shop)/products/[slug]/page.jsx
+
 import { getProductBySlug, getSimilarProducts } from "@/lib/productApi";
 import ProductDetailsClient from "@/components/product/ProductDetailsClient";
 import { notFound } from "next/navigation";

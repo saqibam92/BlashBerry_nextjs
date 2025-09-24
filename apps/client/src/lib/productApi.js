@@ -1,6 +1,5 @@
 // File: apps/client/src/lib/productApi.js
 
-
 import api from "./api";
 
 /**
@@ -68,6 +67,24 @@ export const getSimilarProducts = async (slug) => {
     return response.data.data;
   } catch (error) {
     console.error(`Failed to fetch similar products for slug ${slug}:`, error);
+    return [];
+  }
+};
+
+/**
+ * Searches for products based on a search term.
+ * @param {string} term - The search term.
+ * @returns {Promise<Array>} A promise that resolves to an array of matching products.
+ */
+export const searchProducts = async (term) => {
+  if (!term) return [];
+  try {
+    const response = await api.get("/api/products/search", {
+      params: { term },
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error("Failed to search products:", error);
     return [];
   }
 };

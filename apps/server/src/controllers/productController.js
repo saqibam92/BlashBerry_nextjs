@@ -21,7 +21,11 @@ const getProducts = async (req, res) => {
     // Build query object
     let query = { isActive: true };
 
-    if (category) query.category = category;
+    // If a category query parameter exists, split it by commas and use the $in operator.
+    if (category) {
+      query.category = { $in: category.split(",") };
+    }
+    // if (category) query.category = category;
     if (size) query.sizes = { $in: [size] };
     if (minPrice || maxPrice) {
       query.price = {};
@@ -30,7 +34,8 @@ const getProducts = async (req, res) => {
     }
     if (rating) query.rating = { $gte: Number(rating) };
     if (search) {
-      query.$text = { $search: search };
+      // Use a regex for partial matching on the search page
+      query.name = { $regex: search, $options: "i" };
     }
 
     // Build sort object
@@ -71,6 +76,31 @@ const getProducts = async (req, res) => {
         hasNext: page * limit < total,
         hasPrev: page > 1,
       },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// --- FUNCTION FOR LIVE SEARCH ---
+const searchProducts = async (req, res) => {
+  try {
+    const { term } = req.query;
+    if (!term) {
+      return res.json({ success: true, data: [] });
+    }
+
+    const products = await Product.find({
+      name: { $regex: term, $options: "i" }, // Case-insensitive regex search
+      isActive: true,
+    }).limit(4); // Limit to 4 results for the dropdown
+
+    res.json({
+      success: true,
+      data: products,
     });
   } catch (error) {
     res.status(500).json({
@@ -130,7 +160,7 @@ const getFeaturedProducts = async (req, res) => {
 // Get similar products
 const getSimilarProducts = async (req, res) => {
   try {
-    const product = await Product.findOne({ slug: req.params.slug });
+    const product = await Product.find({ slug: req.params.slug }).limit(4);
 
     if (!product) {
       return res.status(404).json({
@@ -238,12 +268,66 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+// ---Create a new review ---
+const createProductReview = async (req, res) => {
+  const { rating, comment } = req.body;
+  const { slug } = req.params;
+
+  if (!rating || !comment) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Rating and comment are required." });
+  }
+
+  try {
+    const product = await Product.findOne({ slug });
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
+    const alreadyReviewed = product.reviews.find(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Product already reviewed" });
+    }
+
+    const review = {
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+      user: req.user._id,
+    };
+
+    product.reviews.push(review);
+    product.numReviews = product.reviews.length;
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+
+    await product.save();
+    res
+      .status(201)
+      .json({ success: true, message: "Review added successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getProducts,
+  searchProducts,
   getProduct,
   getFeaturedProducts,
   getSimilarProducts,
   createProduct,
   updateProduct,
   deleteProduct,
+  createProductReview,
 };

@@ -1,19 +1,17 @@
 // File: apps/client/src/components/products/ProductDetailsClient.jsx
 
 "use client";
-
 import { useState } from "react";
-import Image from "next/image";
 import Button from "@/components/ui/Button";
-import ProductCard from "../ui/ProductCard"; // Assuming you have this
+import ProductCard from "../ui/ProductCard";
+import ProductGallery from "./ProductGallery"; // Import new gallery
+import ProductReviews from "./ProductReviews"; // Import new reviews component
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import toast from "react-hot-toast";
 
-// This component handles all the client-side logic
 export default function ProductDetailsClient({ product, similarProducts }) {
   const { addToCart } = useCart();
-  // Set the first size as the default selected size
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
 
   const handleAddToCart = () => {
@@ -29,20 +27,11 @@ export default function ProductDetailsClient({ product, similarProducts }) {
     <div className="bg-white">
       <div className="pt-6">
         <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
-          {/* Product Image */}
-          <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              width={800}
-              height={800}
-              className="h-full w-full object-cover object-center"
-              priority
-            />
-          </div>
+          {/* --- CHANGE: Use the new ProductGallery component --- */}
+          <ProductGallery images={product.images} altText={product.name} />
 
           {/* Product Info */}
-          <div className="lg:border-l lg:border-gray-200 lg:pl-8">
+          <div className="lg:border-l lg:border-gray-200 lg:pl-8 mt-8 lg:mt-0">
             <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
               {product.name}
             </h1>
@@ -66,7 +55,7 @@ export default function ProductDetailsClient({ product, similarProducts }) {
                     onClick={() => setSelectedSize(size)}
                     className={`border rounded-md py-2 px-4 text-sm font-medium transition-colors ${
                       selectedSize === size
-                        ? "bg-indigo-600 text-white border-indigo-600"
+                        ? "bg-primary-600 text-white border-primary-600"
                         : "bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
                     }`}
                   >
@@ -78,7 +67,7 @@ export default function ProductDetailsClient({ product, similarProducts }) {
 
             <Button
               onClick={handleAddToCart}
-              className="mt-10 text-dark w-full"
+              className="mt-10 w-full"
               size="lg"
             >
               Add to Cart
@@ -87,11 +76,11 @@ export default function ProductDetailsClient({ product, similarProducts }) {
         </div>
       </div>
 
-      {/* Similar Products Section */}
+      {/* Frequently Bought Together / Similar Products Section */}
       {similarProducts && similarProducts.length > 0 && (
         <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-            You might also like
+            Frequently Bought Together
           </h2>
           <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
             {similarProducts.map((p) => (
@@ -100,6 +89,14 @@ export default function ProductDetailsClient({ product, similarProducts }) {
           </div>
         </div>
       )}
+
+      {/* --- NEW: Add the ProductReviews component --- */}
+      <ProductReviews
+        productSlug={product.slug}
+        reviews={product.reviews}
+        initialRating={product.rating}
+        initialNumReviews={product.numReviews}
+      />
     </div>
   );
 }
