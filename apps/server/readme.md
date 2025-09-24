@@ -1,6 +1,7 @@
+.env.local
 NODE_ENV=development
 PORT=5000
-MONGO_URI=mongodb+srv://ecommerce:ecom1234@next-exommerece.jlfkbw7.mongodb.net/blashberry
+MONGO_URI= Mondodb URI
 JWT_SECRET=your_super_secret_jwt_key_here_make_it_long_and_complex
 JWT_EXPIRE=7d
 GOOGLE_CLIENT_ID=your_google_client_id
