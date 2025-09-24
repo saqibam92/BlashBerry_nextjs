@@ -1,3 +1,4 @@
+.env.local
 NODE_ENV=development
 PORT=5000
 MONGO_URI= Mondodb URI
