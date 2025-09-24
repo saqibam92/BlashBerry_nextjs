@@ -8,6 +8,11 @@ import { notFound } from "next/navigation";
 export default async function ProductDetailPage({ params }) {
   const { slug } = params;
 
+  // --- FIX: Prevent fetching if slug is invalid ---
+  if (!slug || slug === "undefined") {
+    notFound();
+  }
+
   // Fetch product and similar products in parallel
   const [product, similarProducts] = await Promise.all([
     getProductBySlug(slug),

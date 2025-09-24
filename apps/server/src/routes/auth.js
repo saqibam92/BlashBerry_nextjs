@@ -1,3 +1,5 @@
+// File: apps/server/src/routes/auth.js
+
 const express = require("express");
 const { body } = require("express-validator");
 const { register, login, getMe } = require("../controllers/authController");

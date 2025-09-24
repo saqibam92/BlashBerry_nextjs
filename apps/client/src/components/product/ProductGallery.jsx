@@ -1,41 +1,47 @@
 // File: apps/client/src/components/product/ProductGallery.jsx
 
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 
 export default function ProductGallery({ images, altText }) {
   const [mainImage, setMainImage] = useState(images[0]);
+  const imgRef = useRef(null);
+  const containerRef = useRef(null);
 
   const handleMouseMove = (e) => {
+    if (!imgRef.current || !containerRef.current) return;
+
     const { left, top, width, height } =
-      e.currentTarget.getBoundingClientRect();
-    const x = ((e.pageX - left) / width) * 100;
-    const y = ((e.pageY - top) / height) * 100;
-    e.currentTarget.style.backgroundPosition = `${x}% ${y}%`;
+      containerRef.current.getBoundingClientRect();
+    const x = ((e.pageX - left - window.scrollX) / width) * 100;
+    const y = ((e.pageY - top - window.scrollY) / height) * 100;
+
+    imgRef.current.style.transformOrigin = `${x}% ${y}%`;
   };
 
   return (
     <div>
-      {/* Main Image with Zoom */}
-      <figure
+      {/* Main Image Container */}
+      <div
+        ref={containerRef}
         onMouseMove={handleMouseMove}
-        style={{ backgroundImage: `url(${mainImage})` }}
-        className="relative aspect-square w-full overflow-hidden rounded-lg bg-cover bg-center cursor-zoom-in"
+        className="relative aspect-square w-full overflow-hidden rounded-lg cursor-zoom-in group"
       >
         <Image
+          ref={imgRef}
           src={mainImage}
           alt={altText}
-          width={800}
-          height={800}
-          className="h-full w-full object-cover object-center transition-opacity duration-500 opacity-0 hover:opacity-100"
+          fill
+          className="object-contain w-full h-full transition-transform duration-300 ease-in-out group-hover:scale-[2.5]" // Scale is 2.5 for ~5x feel
+          sizes="(max-width: 1024px) 100vw, 50vw"
           priority
         />
-      </figure>
+      </div>
 
       {/* Thumbnails */}
       <div className="mx-auto mt-4 w-full max-w-2xl lg:max-w-none">
-        <ul className="grid grid-cols-4 gap-4">
+        <ul className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-4">
           {images.map((image, index) => (
             <li key={index} className="aspect-square">
               <button
