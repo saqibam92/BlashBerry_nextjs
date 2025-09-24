@@ -1,4 +1,4 @@
-// File: apps/client/src/components/products/ProductCard.jsx
+// File: apps/client/src/components/product/ProductCard.jsx
 
 import Link from "next/link";
 import Image from "next/image";

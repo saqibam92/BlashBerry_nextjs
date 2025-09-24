@@ -4,12 +4,14 @@ const express = require("express");
 const { body } = require("express-validator");
 const {
   getProducts,
+  searchProducts,
   getProduct,
   getFeaturedProducts,
   getSimilarProducts,
   createProduct,
   updateProduct,
   deleteProduct,
+  createProductReview,
 } = require("../controllers/productController");
 const { protect, admin } = require("../middleware/auth");
 
@@ -45,9 +47,11 @@ const productValidation = [
 
 // Public routes
 router.get("/", getProducts);
+router.get("/search", searchProducts);
 router.get("/featured", getFeaturedProducts);
 router.get("/:slug", getProduct);
 router.get("/:slug/similar", getSimilarProducts);
+router.post("/:slug/reviews", protect, createProductReview);
 
 // Admin routes
 router.post("/", protect, admin, productValidation, createProduct);

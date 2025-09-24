@@ -1,8 +1,6 @@
-// File: apps/client/src/components/products/ProductFilter.jsx
-<<<<<<< HEAD
+// File: apps/client/src/components/product/ProductFilter.jsx
+
 "use client";
-=======
->>>>>>> efe85d4b10dbb84309514e8dd369525e1ee8b165
 
 import { useState } from "react";
 import {
