@@ -1,5 +1,3 @@
-// File: apps/client/src/app/layout.js
-
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext"; // Import AuthProvider
@@ -17,7 +15,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* AuthProvider wraps everything */}
+        {/* AuthProvider now wraps the entire application */}
         <AuthProvider>
           <CartProvider>
             <Toaster position="bottom-center" />

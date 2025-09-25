@@ -1,6 +1,6 @@
 // File: apps/client/src/app/(shop)/page.js (Homepage)
 
-import ProductCard from "@/components/ui/ProductCard";
+import ProductCard from "@/components/product/ProductCard";
 import { getFeaturedProducts } from "@/lib/productApi";
 
 // Mock data - replace with API call

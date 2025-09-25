@@ -1,11 +1,11 @@
 // File: apps/client/src/lib/api.js
 
 import axios from "axios";
+import Cookies from "js-cookie"; // Import js-cookie
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -18,7 +18,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
+      // --- FIX: Read the token from Cookies, not localStorage ---
+      const token = Cookies.get("token");
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -35,11 +36,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
       if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/auth/login";
+        Cookies.remove("token");
+        // Redirect to the appropriate login page
+        if (window.location.pathname.startsWith("/admin")) {
+          window.location.href = "/admin-login";
+        } else {
+          window.location.href = "/login";
+        }
       }
     }
     return Promise.reject(error);

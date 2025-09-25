@@ -8,6 +8,7 @@ require("dotenv").config({ path: "./.env.local" });
 const connectDB = require("./config/database");
 
 // Route imports
+const adminRoutes = require("./routes/admin");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
 const orderRoutes = require("./routes/orders");
@@ -46,6 +47,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Routes
+app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
@@ -71,10 +73,10 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use((req, res, next) => {
-res.status(404).json({
+  res.status(404).json({
     success: false,
     message: `API endpoint not found: ${req.originalUrl}`,
-});
+  });
 });
 
 app.listen(PORT, () => {

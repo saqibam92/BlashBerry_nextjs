@@ -118,8 +118,48 @@ const getMe = async (req, res) => {
   });
 };
 
+// ---Admin Login ---
+const adminLogin = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const { email, password } = req.body;
+
+    // Find user and explicitly check for 'admin' role
+    const user = await User.findOne({ email, role: "admin" }).select(
+      "+password"
+    );
+
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials or not an admin",
+      });
+    }
+
+    const token = generateToken(user._id);
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
+  adminLogin,
 };

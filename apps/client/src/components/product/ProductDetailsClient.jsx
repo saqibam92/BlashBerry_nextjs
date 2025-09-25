@@ -3,7 +3,7 @@
 "use client";
 import { useState } from "react";
 import Button from "@/components/ui/Button";
-import ProductCard from "../ui/ProductCard";
+import ProductCard from "./ProductCard";
 import ProductGallery from "./ProductGallery"; // Import new gallery
 import ProductReviews from "./ProductReviews"; // Import new reviews component
 import { formatPrice } from "@/lib/utils";
