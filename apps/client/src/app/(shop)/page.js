@@ -4,24 +4,23 @@ import ProductCard from "@/components/product/ProductCard";
 import BannerSlider from "@/components/home/BannerSlider";
 import { getFeaturedProducts, getActiveBanners } from "@/lib/productApi";
 
-// This new function fetches data safely, returning empty arrays on error
+// This new function fetches data safely, returning empty arrays if the API fails.
 async function getHomePageData() {
   try {
     // Fetch banners and products in parallel for better performance
-    const [bannersRes, productsRes] = await Promise.all([
+    const [bannersRes, products] = await Promise.all([
       getActiveBanners(),
       getFeaturedProducts(),
     ]);
 
-    // Ensure we return arrays even if the API response is malformed
-    const banners = bannersRes?.data || [];
-    const products = productsRes || []; // getFeaturedProducts already returns an array
+    // Safely access the nested data property for banners
+    const banners = bannersRes?.data?.data || [];
 
     return { banners, products };
   } catch (error) {
-    // If ANY API call fails during the build, log the error and return empty data.
-    // This allows the page to still build successfully.
+    // If ANY API call fails during the Vercel build, this will catch the error.
     console.error("Failed to fetch homepage data during build:", error.message);
+    // It returns empty arrays, allowing the page to build successfully without data.
     return { banners: [], products: [] };
   }
 }
@@ -46,7 +45,8 @@ export default async function HomePage() {
           </div>
         ) : (
           <p className="mt-6 text-gray-500">
-            Could not load featured products at this time.
+            Could not load featured products at this time. Please check back
+            later.
           </p>
         )}
       </div>
