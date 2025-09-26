@@ -1,5 +1,6 @@
 // File: apps/server/src/controllers/productController.js
 
+const Category = require("../models/Category");
 const Product = require("../models/Product");
 const { validationResult } = require("express-validator");
 
@@ -319,6 +320,26 @@ const createProductReview = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+// --- Category Management ---
+// const getCategories = async (req, res) => {
+//   try {
+//     const categories = await Category.find();
+//     res.json({ success: true, data: categories });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: "Server Error" });
+//   }
+// };
+
+// --- Get all unique categories from products ---
+const getCategories = async (req, res) => {
+  try {
+    // This is more efficient as it only returns the unique category strings
+    const categories = await Product.distinct("category", { isActive: true });
+    res.json({ success: true, data: categories });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
 
 module.exports = {
   getProducts,
@@ -330,4 +351,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   createProductReview,
+  getCategories,
 };

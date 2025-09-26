@@ -12,8 +12,10 @@ const {
   updateProduct,
   deleteProduct,
   createProductReview,
+  getCategories,
 } = require("../controllers/productController");
 const { protect, admin } = require("../middleware/auth");
+const Banner = require("../models/Banner");
 
 const router = express.Router();
 
@@ -52,6 +54,17 @@ router.get("/featured", getFeaturedProducts);
 router.get("/:slug", getProduct);
 router.get("/:slug/similar", getSimilarProducts);
 router.post("/:slug/reviews", protect, createProductReview);
+router.get("/categories", getCategories);
+
+// --- NEW PUBLIC ROUTE ---
+router.get("/banners/active", async (req, res) => {
+  try {
+    const banners = await Banner.find({ isActive: true }).sort({ priority: 1 });
+    res.json({ success: true, data: banners });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
 
 // Admin routes
 router.post("/", protect, admin, productValidation, createProduct);

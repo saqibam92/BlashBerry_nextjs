@@ -1,7 +1,9 @@
 // File: apps/client/src/app/(shop)/page.js (Homepage)
 
 import ProductCard from "@/components/product/ProductCard";
+import BannerSlider from "@/components/home/BannerSlider";
 import { getFeaturedProducts } from "@/lib/productApi";
+import { getActiveBanners } from "@/lib/productApi";
 
 // Mock data - replace with API call
 // const getFeaturedProducts = async () => {
@@ -9,11 +11,17 @@ import { getFeaturedProducts } from "@/lib/productApi";
 // };
 
 export default async function HomePage() {
-  const featuredProducts = await getFeaturedProducts();
+  // Fetch banners and products in parallel for faster loading
+  const [banners, featuredProducts] = await Promise.all([
+    getActiveBanners(),
+    getFeaturedProducts(),
+  ]);
 
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+        {/* --- BANNER SLIDER --- */}
+        <BannerSlider banners={banners.data.data} />
         <h2 className="text-2xl font-bold tracking-tight text-gray-900">
           Featured Products
         </h2>

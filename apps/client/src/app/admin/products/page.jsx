@@ -1,5 +1,4 @@
 // File: apps/client/src/app/admin/products/page.jsx
-
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -61,7 +60,6 @@ export default function AdminProductsPage() {
     fetchData();
   }, []);
 
-  // Apply filters whenever the filter state changes
   useEffect(() => {
     let result = products;
     if (filters.category) {
@@ -77,6 +75,15 @@ export default function AdminProductsPage() {
 
   const handleFilterChange = (e) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleToggle = async (id, field, currentValue) => {
+    await toast.promise(updateAdminProduct(id, { [field]: !currentValue }), {
+      loading: "Updating...",
+      success: "Product updated!",
+      error: "Update failed.",
+    });
+    fetchData(); // Refresh data after toggle
   };
 
   const handleDelete = async (id) => {
@@ -186,10 +193,24 @@ export default function AdminProductsPage() {
                 <TableCell>{product.category?.name}</TableCell>
                 <TableCell>{formatPrice(product.price)}</TableCell>
                 <TableCell>
-                  <Switch checked={product.isFeatured} />
+                  <Switch
+                    checked={product.isFeatured}
+                    onChange={() =>
+                      handleToggle(
+                        product._id,
+                        "isFeatured",
+                        product.isFeatured
+                      )
+                    }
+                  />
                 </TableCell>
                 <TableCell>
-                  <Switch checked={product.isActive} />
+                  <Switch
+                    checked={product.isActive}
+                    onChange={() =>
+                      handleToggle(product._id, "isActive", product.isActive)
+                    }
+                  />
                 </TableCell>
                 <TableCell align="right">
                   <IconButton

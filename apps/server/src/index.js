@@ -12,6 +12,7 @@ const adminRoutes = require("./routes/admin");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
 const orderRoutes = require("./routes/orders");
+const categoryRoutes = require("./routes/category");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,17 +20,8 @@ const PORT = process.env.PORT || 5000;
 // Connect to database
 connectDB();
 
-// Security middleware
+// 1. Core Security & CORS
 app.use(helmet());
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-});
-app.use(limiter);
-
-// CORS configuration
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
@@ -37,20 +29,30 @@ app.use(
   })
 );
 
-// Body parser middleware
+// 2. Body Parsers
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Logging middleware
+// 3. Rate Limiting (after CORS and parsing)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // Increased limit for development
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(limiter);
+
+// 4. Logging
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-// Routes
+// 5. API Routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/category", categoryRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

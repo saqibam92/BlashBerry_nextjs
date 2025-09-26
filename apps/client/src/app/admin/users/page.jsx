@@ -1,3 +1,4 @@
+// apps/client/src/app/admin/users/page.jsx
 "use client";
 import { useState, useEffect } from "react";
 import {
@@ -23,6 +24,7 @@ import {
   Select,
   MenuItem,
   CircularProgress,
+  FormControlLabel,
 } from "@mui/material";
 import { Edit, Delete, Add } from "@mui/icons-material";
 import {
@@ -34,11 +36,12 @@ import {
 import { formatDate } from "@/lib/utils";
 import toast from "react-hot-toast";
 
+// Reusable Form Component for Creating/Editing Users
 const UserForm = ({ open, onClose, onSave, user }) => {
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
-    // When the user prop changes, update the form data
+    // Populate form when 'user' prop changes (for editing)
     setFormData(
       user || {
         name: "",
@@ -59,8 +62,8 @@ const UserForm = ({ open, onClose, onSave, user }) => {
   };
 
   const handleSave = () => {
-    // For edits, we don't send the password if it's empty
     const payload = { ...formData };
+    // Don't send an empty password field when editing
     if (user?._id && !payload.password) {
       delete payload.password;
     }
@@ -71,7 +74,12 @@ const UserForm = ({ open, onClose, onSave, user }) => {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{user?._id ? "Edit User" : "Add New User"}</DialogTitle>
       <DialogContent
-        sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          pt: "16px !important",
+        }}
       >
         <TextField
           name="name"
@@ -108,6 +116,16 @@ const UserForm = ({ open, onClose, onSave, user }) => {
             <MenuItem value="admin">Admin</MenuItem>
           </Select>
         </FormControl>
+        <FormControlLabel
+          control={
+            <Switch
+              name="isActive"
+              checked={formData.isActive || false}
+              onChange={handleChange}
+            />
+          }
+          label="Active Status"
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
@@ -119,6 +137,7 @@ const UserForm = ({ open, onClose, onSave, user }) => {
   );
 };
 
+// Main Page Component
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -224,9 +243,7 @@ export default function AdminUsersPage() {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.role}</TableCell>
                   <TableCell>{formatDate(user.createdAt)}</TableCell>
-                  <TableCell>
-                    <Switch checked={user.isActive} disabled />
-                  </TableCell>
+                  <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
                   <TableCell align="right">
                     <IconButton
                       color="primary"

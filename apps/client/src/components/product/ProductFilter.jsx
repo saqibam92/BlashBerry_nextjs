@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -18,46 +18,78 @@ import {
   FormLabel,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { getCategories } from "@/lib/productApi";
 
 // Pass onFilterChange as a prop
 const ProductFilter = ({ onFilterChange }) => {
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedSort, setSelectedSort] = useState("newest");
+  const [categories, setCategories] = useState([]);
 
-  // Mock data - in a real app, you might fetch these from the API
-  const categories = [
-    "T-Shirts",
-    "Hoodies",
-    "Jeans",
-    "Dresses",
-    "Shoes",
-    "Jackets",
-  ];
-
-  const handlePriceChange = (event, newValue) => {
-    setPriceRange(newValue);
-  };
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await getCategories();
+        if (res.success) {
+          setCategories(res.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories for filter:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleCategoryChange = (event) => {
-    const { name, checked } = event.target;
+    const { value, checked } = event.target; // The 'value' will be the category _id
     setSelectedCategories((prev) =>
-      checked ? [...prev, name] : prev.filter((cat) => cat !== name)
+      checked ? [...prev, value] : prev.filter((id) => id !== value)
     );
-  };
-
-  const handleSortChange = (event) => {
-    setSelectedSort(event.target.value);
   };
 
   const applyFilters = () => {
     onFilterChange({
       minPrice: priceRange[0],
       maxPrice: priceRange[1],
-      category: selectedCategories.join(","), // API can split by comma
+      category: selectedCategories.join(","), // Join the IDs into a string
       sort: selectedSort,
     });
   };
+
+  // Mock data - in a real app, you might fetch these from the API
+  // const categories = [
+  //   "T-Shirts",
+  //   "Hoodies",
+  //   "Jeans",
+  //   "Dresses",
+  //   "Shoes",
+  //   "Jackets",
+  // ];
+
+  const handlePriceChange = (event, newValue) => {
+    setPriceRange(newValue);
+  };
+
+  // const handleCategoryChange = (event) => {
+  //   const { name, checked } = event.target;
+  //   setSelectedCategories((prev) =>
+  //     checked ? [...prev, name] : prev.filter((cat) => cat !== name)
+  //   );
+  // };
+
+  const handleSortChange = (event) => {
+    setSelectedSort(event.target.value);
+  };
+
+  // const applyFilters = () => {
+  //   onFilterChange({
+  //     minPrice: priceRange[0],
+  //     maxPrice: priceRange[1],
+  //     category: selectedCategories.join(","), // API can split by comma
+  //     sort: selectedSort,
+  //   });
+  // };
 
   return (
     <div className="p-4 border rounded-lg shadow-sm space-y-4">
@@ -68,13 +100,24 @@ const ProductFilter = ({ onFilterChange }) => {
           <Typography>Category</Typography>
         </AccordionSummary>
         <AccordionDetails className="flex flex-col">
-          {categories.map((cat) => (
-            <FormControlLabel
-              key={cat}
-              control={<Checkbox name={cat} onChange={handleCategoryChange} />}
-              label={cat}
-            />
-          ))}
+          {categories.length > 0 ? (
+            categories.map((cat) => (
+              <FormControlLabel
+                key={cat._id}
+                label={cat.name}
+                control={
+                  <Checkbox
+                    value={cat._id} // --- FIX: Use the ID as the value ---
+                    onChange={handleCategoryChange}
+                  />
+                }
+              />
+            ))
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Loading categories...
+            </Typography>
+          )}
         </AccordionDetails>
       </Accordion>
 

@@ -88,3 +88,20 @@ export const searchProducts = async (term) => {
     return [];
   }
 };
+
+/**
+ * Fetches all active public categories for the filter.
+ * @returns {Promise<Array>} A promise that resolves to an array of category objects.
+ */
+export const getCategories = async () => {
+  try {
+    // --- FIX: Point to the new, correct public endpoint ---
+    const response = await api.get("/api/category/categories");
+    return response.data; // The API returns { success: true, data: [...] }
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+    return { success: false, data: [] };
+  }
+};
+
+export const getActiveBanners = () => api.get("/api/products/banners/active");

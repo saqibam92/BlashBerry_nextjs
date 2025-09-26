@@ -21,6 +21,7 @@ export const updateAdminProduct = (id, data) =>
   api.put(`/api/admin/products/${id}`, data);
 export const deleteAdminProduct = (id) =>
   api.delete(`/api/admin/products/${id}`);
+export const getAdminProductById = (id) => api.get(`/api/admin/products/${id}`);
 
 // --- USER APIS ---
 export const getAdminUsers = () => api.get("/api/admin/users");
@@ -33,3 +34,14 @@ export const deleteAdminUser = (id) => api.delete(`/api/admin/users/${id}`);
 export const getAdminOrders = () => api.get("/api/admin/orders");
 export const updateAdminOrderStatus = (id, status) =>
   api.put(`/api/admin/orders/${id}/status`, { status });
+
+// --- BANNER APIS ---
+export const getAdminBanners = () => api.get("/api/admin/banners");
+export const createAdminBanner = (data) => api.post("/api/admin/banners", data);
+export const updateAdminBanner = (id, data) =>
+  api.put(`/api/admin/banners/${id}`, data);
+export const deleteAdminBanner = (id) => api.delete(`/api/admin/banners/${id}`);
+export const uploadBannerImage = (formData) =>
+  api.post("/api/admin/upload/banner", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
