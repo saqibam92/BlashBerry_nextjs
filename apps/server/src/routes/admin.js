@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadPath = path.join(
       __dirname,
-      "../../../../client/public/uploads/banners"
+      "../../../client/public/uploads/banners"
     );
     fs.mkdirSync(uploadPath, { recursive: true }); // Ensure directory exists
     cb(null, uploadPath);

@@ -4,10 +4,10 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import ProductCard from "@/components/ui/ProductCard";
 import ProductFilter from "@/components/product/ProductFilter"; // Import the filter component
 import { getAllProducts } from "@/lib/productApi";
 import { CircularProgress, Pagination } from "@mui/material";
+import ProductCard from "@/components/product/ProductCard";
 
 function SearchResults() {
   const searchParams = useSearchParams();

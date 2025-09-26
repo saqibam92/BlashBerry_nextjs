@@ -80,7 +80,7 @@ export const SearchBar = () => {
                     className="flex items-center p-3 hover:bg-gray-100"
                   >
                     <Image
-                      src={product.imageUrl}
+                      src={product.images[0]}
                       alt={product.name}
                       width={50}
                       height={50}
