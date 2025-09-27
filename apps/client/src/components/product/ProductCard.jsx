@@ -1,11 +1,24 @@
 // File: apps/client/src/components/product/ProductCard.jsx
 
+"use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Card, CardContent, Typography, Rating } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Rating,
+  Button,
+  Box,
+} from "@mui/material";
+import { ShoppingCart } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 const ProductCard = ({ product }) => {
+  const router = useRouter();
+
   // Prevent rendering if the product object is invalid to avoid any errors.
   if (!product || !product.slug) {
     // This can happen during initial renders before data is loaded.
@@ -27,6 +40,13 @@ const ProductCard = ({ product }) => {
     })?.url ||
     product.images?.[0] ||
     "https://placehold.co/400x400/f8fafc/64748b?text=No+Image";
+
+  const handleAddToCartClick = (e) => {
+    e.preventDefault(); // Prevent link navigation
+    e.stopPropagation(); // Stop event bubbling
+    router.push(`/products/${product.slug}`); // Redirect to select size
+    toast("Please select a size to add to cart.", { icon: "ℹ️" });
+  };
 
   return (
     <Card className="h-full flex flex-col transform transition-transform duration-300 hover:scale-105 hover:shadow-xl group">
@@ -69,6 +89,16 @@ const ProductCard = ({ product }) => {
           </div>
         </CardContent>
       </Link>
+      <Box sx={{ p: 2, pt: 0 }}>
+        <Button
+          variant="outlined"
+          fullWidth
+          startIcon={<ShoppingCart size={16} />}
+          onClick={handleAddToCartClick}
+        >
+          Add to Cart
+        </Button>
+      </Box>
     </Card>
   );
 };
