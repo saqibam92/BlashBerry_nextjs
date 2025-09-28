@@ -8,6 +8,7 @@ require("dotenv").config({ path: path.resolve(__dirname, "../.env.local") });
 const User = require("../src/models/User");
 const Product = require("../src/models/Product");
 const Order = require("../src/models/Order"); // Import Order model
+const Category = require("../src/models/Category");
 
 const connectDB = async () => {
   if (!process.env.MONGO_URI) {
@@ -23,101 +24,197 @@ const connectDB = async () => {
   }
 };
 
-const seedUsers = async () => {
+const seedCategory = async () => {
   try {
-    await User.deleteMany();
+    const categories = [
+      // {
+      //   name: "Bras",
+      //   image:
+      //     "https://images.unsplash.com/photo-1585148710999-3899134a9488?q=80&w=1887&auto=format&fit=crop",
+      //   priority: 1,
+      //   isActive: true,
+      // },
+      {
+        name: "Panties",
+        image:
+          "https://images.unsplash.com/photo-1619138443907-6e5b5311e2f7?q=80&w=1887&auto=format&fit=crop",
+        priority: 2,
+        isActive: true,
+      },
+      {
+        name: "Lingerie Sets",
+        image:
+          "https://images.unsplash.com/photo-1631896847798-a0353a25f7a0?q=80&w=1887&auto=format&fit=crop",
+        priority: 3,
+        isActive: true,
+      },
+      {
+        name: "Sleepwear",
+        image:
+          "https://images.unsplash.com/photo-1594396539202-a7b6860f3d9d?q=80&w=1887&auto=format&fit=crop",
+        priority: 4,
+        isActive: true,
+      },
+      {
+        name: "Slips & Babydolls",
+        image:
+          "https://images.unsplash.com/photo-1605353151433-72c0693a4a9c?q=80&w=1887&auto=format&fit=crop",
+        priority: 5,
+        isActive: true,
+      },
+      {
+        name: "Bodysuits",
+        image:
+          "https://images.unsplash.com/photo-1617489422185-3d5f87b8f0d2?q=80&w=1887&auto=format&fit=crop",
+        priority: 6,
+        isActive: true,
+      },
+      {
+        name: "Robes",
+        image:
+          "https://images.unsplash.com/photo-1616859516347-8a4e3a4e4e4d?q=80&w=1887&auto=format&fit=crop",
+        priority: 7,
+        isActive: true,
+      },
+      {
+        name: "Corsets & Bustiers",
+        image:
+          "https://images.unsplash.com/photo-1597821689219-913a0518c1b3?q=80&w=1887&auto=format&fit=crop",
+        priority: 8,
+        isActive: true,
+      },
+      {
+        name: "Shapewear",
+        image:
+          "https://images.unsplash.com/photo-1620921201900-538a7c2e0bca?q=80&w=1887&auto=format&fit=crop",
+        priority: 9,
+        isActive: true,
+      },
+      {
+        name: "Hosiery & Garters",
+        image:
+          "https://images.unsplash.com/photo-1599855131526-3a7a4f913611?q=80&w=1887&auto=format&fit=crop",
+        priority: 10,
+        isActive: true,
+      },
+      {
+        name: "Bridal Lingerie",
+        image:
+          "https://images.unsplash.com/photo-1591547900488-80e1c12ab995?q=80&w=1887&auto=format&fit=crop",
+        priority: 11,
+        isActive: true,
+      },
+      {
+        name: "Accessories",
+        image:
+          "https://images.unsplash.com/photo-1594939235976-92c206f3ed1b?q=80&w=1887&auto=format&fit=crop",
+        priority: 12,
+        isActive: true,
+      },
+    ];
 
-    // Create Master Admin
-    const adminUser = new User({
-      name: "Master Admin",
-      email: "admin@blashberry.com",
-      password: "adminpassword", // This will be hashed on save
-      role: "admin",
-      provider: "local",
-    });
-    await adminUser.save();
-    console.log("Master Admin created successfully.");
-
-    // Create Test User
-    const testUser1 = new User({
-      name: "Test User ",
-      email: "test1@example.com",
-      password: "testpassword", // This will be hashed on save
-      role: "user",
-      provider: "local",
-    });
-    await testUser1.save();
-    console.log("Test User 1 created successfully.");
-    // Create Test User
-    const testUser2 = new User({
-      name: "Test User 2",
-      email: "test2@example.com",
-      password: "testpassword", // This will be hashed on save
-      role: "user",
-      provider: "local",
-    });
-    await testUser2.save();
-    console.log("Test User 2 created successfully.");
-    // Create Test User
-    const testUser3 = new User({
-      name: "Test User 3",
-      email: "test3@example.com",
-      password: "testpassword", // This will be hashed on save
-      role: "user",
-      provider: "local",
-    });
-    await testUser3.save();
-    console.log("Test User 3 created successfully.");
-    // Create Test User
-    const testUser4 = new User({
-      name: "Test User 4",
-      email: "test4@example.com",
-      password: "testpassword", // This will be hashed on save
-      role: "user",
-      provider: "local",
-    });
-    await testUser4.save();
-    console.log("Test User created successfully.");
-
-    // const users = [
-    //   {
-    //     name: "Master Admin",
-    //     email: "admin@blashberry.com",
-    //     password: "adminpassword", // Use a strong password in production
-    //     role: "admin",
-    //     provider: "local",
-    //   },
-    //   {
-    //     name: "Test User 1",
-    //     email: "test1@example.com",
-    //     password: "testpassword1",
-    //     role: "user",
-    //     provider: "local",
-    //   },
-    //   {
-    //     name: "Test User 2",
-    //     email: "test2@example.com",
-    //     password: "testpassword2",
-    //     role: "user",
-    //     provider: "local",
-    //   },
-    //   {
-    //     name: "Test User 3",
-    //     email: "test3@example.com",
-    //     password: "testpassword3",
-    //     role: "user",
-    //     provider: "local",
-    //   },
-    // ];
-
-    // Using insertMany to hash passwords via the pre-save hook
-    // await User.insertMany(users);
-
-    // console.log("Master Admin and Test User created successfully.");
+    await Category.insertMany(categories);
+    console.log("Categories seeded successfully");
   } catch (error) {
-    console.error("Error seeding users:", error);
+    console.log(error);
   }
 };
+
+// const seedUsers = async () => {
+//   try {
+//     await User.deleteMany();
+
+//     // Create Master Admin
+//     const adminUser = new User({
+//       name: "Master Admin",
+//       email: "admin@blashberry.com",
+//       password: "adminpassword", // This will be hashed on save
+//       role: "admin",
+//       provider: "local",
+//     });
+//     await adminUser.save();
+//     console.log("Master Admin created successfully.");
+
+//     // Create Test User
+//     const testUser1 = new User({
+//       name: "Test User ",
+//       email: "test1@example.com",
+//       password: "testpassword", // This will be hashed on save
+//       role: "user",
+//       provider: "local",
+//     });
+//     await testUser1.save();
+//     console.log("Test User 1 created successfully.");
+//     // Create Test User
+//     const testUser2 = new User({
+//       name: "Test User 2",
+//       email: "test2@example.com",
+//       password: "testpassword", // This will be hashed on save
+//       role: "user",
+//       provider: "local",
+//     });
+//     await testUser2.save();
+//     console.log("Test User 2 created successfully.");
+//     // Create Test User
+//     const testUser3 = new User({
+//       name: "Test User 3",
+//       email: "test3@example.com",
+//       password: "testpassword", // This will be hashed on save
+//       role: "user",
+//       provider: "local",
+//     });
+//     await testUser3.save();
+//     console.log("Test User 3 created successfully.");
+//     // Create Test User
+//     const testUser4 = new User({
+//       name: "Test User 4",
+//       email: "test4@example.com",
+//       password: "testpassword", // This will be hashed on save
+//       role: "user",
+//       provider: "local",
+//     });
+//     await testUser4.save();
+//     console.log("Test User created successfully.");
+
+//     // const users = [
+//     //   {
+//     //     name: "Master Admin",
+//     //     email: "admin@blashberry.com",
+//     //     password: "adminpassword", // Use a strong password in production
+//     //     role: "admin",
+//     //     provider: "local",
+//     //   },
+//     //   {
+//     //     name: "Test User 1",
+//     //     email: "test1@example.com",
+//     //     password: "testpassword1",
+//     //     role: "user",
+//     //     provider: "local",
+//     //   },
+//     //   {
+//     //     name: "Test User 2",
+//     //     email: "test2@example.com",
+//     //     password: "testpassword2",
+//     //     role: "user",
+//     //     provider: "local",
+//     //   },
+//     //   {
+//     //     name: "Test User 3",
+//     //     email: "test3@example.com",
+//     //     password: "testpassword3",
+//     //     role: "user",
+//     //     provider: "local",
+//     //   },
+//     // ];
+
+//     // Using insertMany to hash passwords via the pre-save hook
+//     // await User.insertMany(users);
+
+//     // console.log("Master Admin and Test User created successfully.");
+//   } catch (error) {
+//     console.error("Error seeding users:", error);
+//   }
+// };
 
 // const seedUsers = async () => {
 //   try {
@@ -253,9 +350,10 @@ const seedUsers = async () => {
 
 const seedData = async () => {
   await connectDB();
-  await seedUsers();
+  // await seedUsers();
+  await seedCategory();
   // await seedProducts();
-  await Order.deleteMany(); // Also clear previous orders
+  // await Order.deleteMany(); // Also clear previous orders
   console.log("Database seeding completed!");
   mongoose.connection.close();
 };

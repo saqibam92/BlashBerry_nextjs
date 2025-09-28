@@ -90,7 +90,7 @@ export default function ProductReviews({
           <p className="mt-2 text-sm text-gray-600">
             Please{" "}
             <Link
-              href="/auth/login"
+              href="/login"
               className="font-medium text-primary-600 hover:underline"
             >
               sign in

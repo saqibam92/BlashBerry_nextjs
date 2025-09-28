@@ -34,6 +34,7 @@ const navItems = [
   { text: "Categories", icon: <Category />, href: "/admin/categories" },
   { text: "Orders", icon: <ShoppingCart />, href: "/admin/orders" },
   { text: "Users", icon: <Group />, href: "/admin/users" },
+  { text: "Banners", icon: <Group />, href: "/admin/banners" },
   { text: "Settings", icon: <Settings />, href: "/admin/settings" },
 ];
 

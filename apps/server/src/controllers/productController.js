@@ -26,7 +26,6 @@ const getProducts = async (req, res) => {
     if (category) {
       query.category = { $in: category.split(",") };
     }
-    // if (category) query.category = category;
     if (size) query.sizes = { $in: [size] };
     if (minPrice || maxPrice) {
       query.price = {};
@@ -61,6 +60,7 @@ const getProducts = async (req, res) => {
     // Execute query with pagination
     const skip = (page - 1) * limit;
     const products = await Product.find(query)
+      .populate("category", "name")
       .sort(sortObj)
       .skip(skip)
       .limit(Number(limit));
@@ -117,24 +117,16 @@ const getProduct = async (req, res) => {
     const product = await Product.findOne({
       slug: req.params.slug,
       isActive: true,
-    });
+    }).populate("category", "name"); // --- FIX: Populate the category name ---
 
     if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
     }
-
-    res.json({
-      success: true,
-      data: product,
-    });
+    res.json({ success: true, data: product });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -161,30 +153,26 @@ const getFeaturedProducts = async (req, res) => {
 // Get similar products
 const getSimilarProducts = async (req, res) => {
   try {
-    const product = await Product.find({ slug: req.params.slug }).limit(4);
+    // --- FIX: Use findOne to get a single product object ---
+    const product = await Product.findOne({ slug: req.params.slug });
 
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
+    if (!product || !product.category) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product or category not found" });
     }
 
     const similarProducts = await Product.find({
       category: product.category,
-      _id: { $ne: product._id },
+      _id: { $ne: product._id }, // Exclude the product itself
       isActive: true,
-    }).limit(4);
+    })
+      .populate("category", "name") // --- FIX: Also populate category for the cards ---
+      .limit(4);
 
-    res.json({
-      success: true,
-      data: similarProducts,
-    });
+    res.json({ success: true, data: similarProducts });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

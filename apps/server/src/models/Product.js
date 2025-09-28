@@ -1,6 +1,7 @@
 // File: apps/server/src/models/Product.js
 
 const mongoose = require("mongoose");
+const { default: slugify } = require("slugify");
 
 // Define the Review Schema first
 const reviewSchema = new mongoose.Schema(
@@ -58,8 +59,8 @@ const productSchema = new mongoose.Schema(
     discount: {
       discountType: {
         type: String,
-        enum: ["percent", "fixed"],
-        default: "fixed",
+        enum: ["Percent", "Fixed"],
+        default: "Fixed",
       },
       discountAmount: { type: Number, default: 0 },
     },

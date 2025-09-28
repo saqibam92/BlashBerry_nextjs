@@ -172,6 +172,7 @@ export default function AdminProductsPage() {
               <TableCell>Unit Price</TableCell>
               <TableCell>Featured</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>In stock</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -212,6 +213,7 @@ export default function AdminProductsPage() {
                     }
                   />
                 </TableCell>
+                <TableCell>{product.stockQuantity}</TableCell>
                 <TableCell align="right">
                   <IconButton
                     color="default"

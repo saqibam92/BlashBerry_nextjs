@@ -74,7 +74,7 @@ const ProductCard = ({ product }) => {
             {product.name}
           </Typography>
           <Typography variant="body2" color="text.secondary" className="mb-2">
-            {product.category}
+            {product.category?.name}
           </Typography>
           <div className="flex items-center justify-between mt-auto">
             <Typography variant="h5" color="primary">

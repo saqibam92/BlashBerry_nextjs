@@ -7,7 +7,7 @@ export default function AddProductPage() {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Add New Product
+        Add New Productn
       </Typography>
       <ProductForm />
     </Box>
