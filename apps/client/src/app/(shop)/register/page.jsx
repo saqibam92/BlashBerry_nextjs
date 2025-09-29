@@ -1,6 +1,6 @@
 // apps / client / src / app / shop / register / page.jsx;
 
-("use client");
+"use client";
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
