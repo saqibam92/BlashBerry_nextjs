@@ -1,9 +1,16 @@
+// apps / server / src / index.js;
+
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
-require("dotenv").config({ path: "./.env.local" });
+const path = require("path"); // 1. Import the 'path' module for robust pathing
+
+// 2. Use a more reliable path to your .env file
+require("dotenv").config({
+  path: path.resolve(__dirname, "../../../.env.local"),
+});
 
 const connectDB = require("./config/database");
 
@@ -12,7 +19,7 @@ const adminRoutes = require("./routes/admin");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
 const orderRoutes = require("./routes/orders");
-const categoryRoutes = require("./routes/category");
+const publicRoutes = require("./routes/public");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,58 +27,59 @@ const PORT = process.env.PORT || 5000;
 // Connect to database
 connectDB();
 
-// 1. Core Security & CORS
+// --- CORRECTED CORS CONFIGURATION ---
 
 // 1. Define your list of allowed origins (whitelist)
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  process.env.CLIENT_URL, // Your Vercel URL from environment variables
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:3005",
 ];
 
-// 2. Core Security & CORS Configuration (MUST COME FIRST)
+// 2. Configure CORS Middleware
 app.use(helmet());
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(
-          new Error(
-            "The CORS policy for this site does not allow access from your origin."
-          ),
-          false
-        );
+      // Allow requests with no origin (like Postman, mobile apps)
+      if (!origin) return callback(null, true);
+
+      // --- 3. THE FIX: Don't throw an error, just disallow ---
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not allow access from your origin.";
+        // Call the callback with an error object, but let cors handle the response
+        return callback(new Error(msg), false);
       }
+      return callback(null, true);
     },
     credentials: true,
   })
 );
 
-// 3. Rate Limiting (comes AFTER CORS)
-// This is important because it allows OPTIONS preflight requests to pass without being rate-limited.
+// The rest of your middleware in the correct order...
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // Increased limit is safer for development and initial testing
+  windowMs: 15 * 60 * 1000,
+  max: 200,
   standardHeaders: true,
   legacyHeaders: false,
 });
 app.use(limiter);
 
-// 4. Body Parsers & Logging
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-// 5. API Routes
+
+// API Routes
+app.use("/api/public", publicRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
-app.use("/api/category", categoryRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
