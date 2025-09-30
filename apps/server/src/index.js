@@ -66,7 +66,6 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-
 // 5. API Routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
