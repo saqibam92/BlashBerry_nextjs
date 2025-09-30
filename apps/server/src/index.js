@@ -1,17 +1,14 @@
-// apps / server / src / index.js;
-
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
-const path = require("path"); // 1. Import the 'path' module for robust pathing
+const path = require("path");
 
 // 2. Use a more reliable path to your .env file
 require("dotenv").config({
   path: path.resolve(__dirname, "../../../.env.local"),
 });
-
 const connectDB = require("./config/database");
 
 // Route imports
@@ -19,7 +16,7 @@ const adminRoutes = require("./routes/admin");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
 const orderRoutes = require("./routes/orders");
-const publicRoutes = require("./routes/public");
+const categoryRoutes = require("./routes/category");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,17 +24,17 @@ const PORT = process.env.PORT || 5000;
 // Connect to database
 connectDB();
 
-// --- CORRECTED CORS CONFIGURATION ---
+// 1. Core Security & CORS
 
 // 1. Define your list of allowed origins (whitelist)
 const allowedOrigins = [
-  process.env.CLIENT_URL, // Your Vercel URL from environment variables
+  process.env.CLIENT_URL,
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:3005",
 ];
 
-// 2. Configure CORS Middleware
+// 2. Core Security & CORS Configuration (MUST COME FIRST)
 app.use(helmet());
 app.use(
   cors({
@@ -58,7 +55,8 @@ app.use(
   })
 );
 
-// The rest of your middleware in the correct order...
+// 3. Rate Limiting (comes AFTER CORS)
+// This is important because it allows OPTIONS preflight requests to pass without being rate-limited.
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
@@ -73,13 +71,12 @@ app.use(limiter);
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-
-// API Routes
-app.use("/api/public", publicRoutes);
+// 5. API Routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/category", categoryRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
