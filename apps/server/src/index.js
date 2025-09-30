@@ -34,26 +34,38 @@ const allowedOrigins = [
   "http://localhost:3005",
 ];
 
-// 2. Core Security & CORS Configuration (MUST COME FIRST)
-app.use(helmet());
+// CORS configuration
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like Postman, mobile apps)
-      if (!origin) return callback(null, true);
-
-      // --- 3. THE FIX: Don't throw an error, just disallow ---
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from your origin.";
-        // Call the callback with an error object, but let cors handle the response
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-    credentials: true,
+    origin: "https://blash-berry-nextjs-client.vercel.app", // Your client origin; use '*' for testing but not production
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"], // Add more if needed (e.g., for JWT)
+    credentials: true, // If using cookies or auth headers
+    preflightContinue: false, // Default; handles OPTIONS automatically
+    optionsSuccessStatus: 204, // Some browsers need this
   })
 );
+
+// 2. Core Security & CORS Configuration (MUST COME FIRST)
+app.use(helmet());
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       // Allow requests with no origin (like Postman, mobile apps)
+//       if (!origin) return callback(null, true);
+
+//       // --- 3. THE FIX: Don't throw an error, just disallow ---
+//       if (allowedOrigins.indexOf(origin) === -1) {
+//         const msg =
+//           "The CORS policy for this site does not allow access from your origin.";
+//         // Call the callback with an error object, but let cors handle the response
+//         return callback(new Error(msg), false);
+//       }
+//       return callback(null, true);
+//     },
+//     credentials: true,
+//   })
+// );
 
 // 3. Rate Limiting (comes AFTER CORS)
 // This is important because it allows OPTIONS preflight requests to pass without being rate-limited.
