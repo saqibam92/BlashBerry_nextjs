@@ -54,7 +54,7 @@ router.get("/featured", getFeaturedProducts);
 router.get("/:slug", getProduct);
 router.get("/:slug/similar", getSimilarProducts);
 router.post("/:slug/reviews", protect, createProductReview);
-router.get("/categories", getCategories);
+// router.get("/categories", getCategories);
 
 // --- NEW PUBLIC ROUTE ---
 router.get("/banners/active", async (req, res) => {

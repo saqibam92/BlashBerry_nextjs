@@ -24,49 +24,49 @@ connectDB();
 
 // 1. Define your list of allowed origins (whitelist)
 const allowedOrigins = [
-  process.env.CLIENT_URL, // Your Vercel URL from environment variables
-  "http://localhost:3000", // Your local development URL
-  "http://localhost:3001", // Common alternative local ports
+  process.env.CLIENT_URL,
+  "http://localhost:3000",
+  "http://localhost:3001",
   "http://localhost:3005",
 ];
 
-// 2. Core Security & CORS Configuration
+// 2. Core Security & CORS Configuration (MUST COME FIRST)
 app.use(helmet());
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, Postman, or server-to-server)
-      if (!origin) return callback(null, true);
-
-      // If the origin is in our whitelist, allow it
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from your origin.";
-        return callback(new Error(msg), false);
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(
+          new Error(
+            "The CORS policy for this site does not allow access from your origin."
+          ),
+          false
+        );
       }
-      return callback(null, true);
     },
     credentials: true,
   })
 );
 
-// 3. Body Parsers
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
-// 4. Rate Limiting (should come AFTER CORS and parsing)
+// 3. Rate Limiting (comes AFTER CORS)
+// This is important because it allows OPTIONS preflight requests to pass without being rate-limited.
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // A reasonable limit
+  max: 200, // Increased limit is safer for development and initial testing
   standardHeaders: true,
   legacyHeaders: false,
 });
 app.use(limiter);
 
-// 5. Logging
+// 4. Body Parsers & Logging
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
 // 5. API Routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
