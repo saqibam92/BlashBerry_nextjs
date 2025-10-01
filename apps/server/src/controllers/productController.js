@@ -135,7 +135,7 @@ const getFeaturedProducts = async (req, res) => {
   try {
     const products = await Product.find({
       isFeatured: true,
-      isActive: true,
+      // isActive: true,
     }).limit(8);
 
     res.json({
